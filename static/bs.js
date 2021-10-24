@@ -30,6 +30,17 @@ function n(x){
     }*/
 }
 
+function phi(x, mu, sigma) {
+    var numerator = Math.exp(-Math.pow(x - mu, 2) / (2 * Math.pow(sigma, 2)));
+    var denominator = Math.sqrt(2 * Math.PI) * sigma;
+
+    return numerator / denominator;
+}
+
+function normalPhi(x) {
+    return phi(x, 0, 1);
+}
+
 function blackScholesDelta(underlyingPrice, strikePrice, riskFreeRate, volatility, timeToMaturity, type) {
     var d1 = (Math.log(underlyingPrice / strikePrice) + (riskFreeRate + volatility * volatility / 2) * timeToMaturity) / (volatility * Math.sqrt(timeToMaturity));
 
@@ -56,16 +67,17 @@ function blackScholesGamma(underlyingPrice, strikePrice, riskFreeRate, volatilit
 function blackScholesTheta(underlyingPrice, strikePrice, riskFreeRate, volatility, timeToMaturity, type) {
     var d1 = (Math.log(underlyingPrice / strikePrice) + (riskFreeRate + volatility * volatility / 2) * timeToMaturity) / (volatility * Math.sqrt(timeToMaturity));
     var d2 = d1 - volatility * Math.sqrt(timeToMaturity);
-    var oneOverT = 1 / timeToMaturity;
+    var oneDay = 1 / 365;
+    var commonInner = underlyingPrice * normalPhi(d1) * volatility / (2 * Math.sqrt(timeToMaturity));
 
     var theta = 0;
     if (type == "call") {
-        theta = -(underlyingPrice * n(d1) * volatility * Math.sqrt(timeToMaturity)) / (2 * Math.sqrt(2 * Math.PI)) - (riskFreeRate * strikePrice * Math.exp(-riskFreeRate * timeToMaturity) * n(d2)) / (2 * Math.sqrt(2 * Math.PI));
+        theta = -commonInner - riskFreeRate * strikePrice * n(d2);
     } else if (type == "put") {
-        theta = -(underlyingPrice * n(d1) * volatility * Math.sqrt(timeToMaturity)) / (2 * Math.sqrt(2 * Math.PI)) + (riskFreeRate * strikePrice * Math.exp(-riskFreeRate * timeToMaturity) * n(d2)) / (2 * Math.sqrt(2 * Math.PI));
+        theta = -commonInner + riskFreeRate * strikePrice * n(-d2);
     }
 
-    return theta;
+    return oneDay * theta;
 }
 
 function blackScholesVega(underlyingPrice, strikePrice, riskFreeRate, volatility, timeToMaturity) {
@@ -123,5 +135,9 @@ if (typeof window === 'undefined') {
     //console.log(blackScholesVega(374.10, 371, -0.0189, .1277, 6 / 365, "put"));
     //console.log(blackScholesGamma(374.10, 376, 0.022, .109977, 6 / 365, "call"));
     //console.log(blackScholesIv(1.28, 374.10, 376, 0.022, 6 / 365, "call"));
-    console.log(blackScholesIv(2.25, 374.10, 372, 0.00, 8 / 365, "put"));
+    //console.log(blackScholesDelta(374.10, 376, 0.0, .109977, 6 / 365, "call"));
+    //console.log(blackScholesTheta(374.10, 376, 0.0, .109977, 6 / 365, "call"));
+    //console.log(blackScholesVega(374.10, 376, 0.0, .109977, 6 / 365));
+    console.log(blackScholesTheta(374.10, 371, 0, .1277, 6 / 365, "put"));
+    //console.log(blackScholesIv(2.25, 374.10, 372, 0.00, 8 / 365, "put"));
 }
