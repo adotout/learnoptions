@@ -93,6 +93,15 @@ if (typeof window === 'undefined') {
         return Math.floor(getRandom(random) * (max - min) + min);
     }
 
+    function getRandomNormal(random, mu, sigma) {
+        var u = 0, v = 0;
+        while (u === 0) u = getRandom(random); //Converting [0,1) to (0,1)
+        while (v === 0) v = getRandom(random);
+        var num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+
+        return num * sigma + mu;
+    }
+
     if (typeof window === 'undefined') {
         /*let r = new Random(14890);
         for (let i = 0; i < 100; i++) {
@@ -101,13 +110,20 @@ if (typeof window === 'undefined') {
         module.exports = {
             Random: Random,
             getRandom: getRandom,
-            getRandomInt: getRandomInt
+            getRandomInt: getRandomInt,
+            getRandomNormal: getRandomNormal
         };
+        var rand = new Random(23489);
+        for (var i = 0; i < 10000; i++) {
+            //console.log(getRandom(rand));
+            console.log(getRandomNormal(rand, 0, 10));
+        }
     } else {
         window.random = {
             Random: Random,
             getRandom: getRandom,
-            getRandomInt: getRandomInt
+            getRandomInt: getRandomInt,
+            getRandomNormal: getRandomNormal
         };
     }
 })();
