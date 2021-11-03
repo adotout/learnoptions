@@ -50,4 +50,4 @@ Lets look at an example where buying a call gives us _leverage_. Say we feel str
 
 I'm only giving you one option here, so go ahead and click "Buy" after you understand the inputs.
 
-{{< orderinput />}}
+{{< marketsim id="basics0" >}}
